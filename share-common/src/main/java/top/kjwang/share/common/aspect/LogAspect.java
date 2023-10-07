@@ -1,4 +1,4 @@
-package top.kjwang.share.user.aspect;
+package top.kjwang.share.common.aspect;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.support.spring.PropertyPreFilters;
@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @date 2023/10/7 10:13
  * @description LogAspect
  */
+
 @Aspect
 @Component
 @Slf4j
