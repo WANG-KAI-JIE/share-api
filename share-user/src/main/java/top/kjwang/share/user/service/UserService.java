@@ -5,9 +5,12 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import top.kjwang.share.common.exception.BusinessException;
 import top.kjwang.share.common.exception.BusinessExceptionEnum;
+import top.kjwang.share.common.util.SnowUtil;
 import top.kjwang.share.user.domain.dto.LoginDTO;
 import top.kjwang.share.user.domain.entity.User;
 import top.kjwang.share.user.mapper.UserMapper;
+
+import java.util.Date;
 
 /**
  * @author kjwang
@@ -37,5 +40,28 @@ public class UserService {
 		}
 		// 都正确，返回
 		return userDB;
+	}
+
+	public Long register(LoginDTO loginDTO) {
+		// 根据手机号查询用户
+		User userDB = userMapper.selectOne(new QueryWrapper<User>().lambda().eq(User::getPhone, loginDTO.getPhone()));
+		// 找到了，手机号已被注册
+		if (userDB != null) {
+			throw new BusinessException(BusinessExceptionEnum.PHONE_EXIST);
+		}
+		User savedUser = User.builder()
+				// 使用雪花算法生成 id
+				.id(SnowUtil.getSnowflakeNextId())
+				.phone(loginDTO.getPhone())
+				.password(loginDTO.getPassword())
+				.nickname("新用户")
+				.roles("user")
+				.avatarUrl("https://fatcat666.oss-cn-nanjing.aliyuncs.com/image/202302250942314.png")
+				.bonus(100)
+				.createTime(new Date())
+				.updateTime(new Date())
+				.build();
+		userMapper.insert(savedUser);
+		return savedUser.getId();
 	}
 }
