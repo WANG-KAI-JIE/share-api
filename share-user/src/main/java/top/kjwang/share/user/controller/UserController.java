@@ -2,6 +2,7 @@ package top.kjwang.share.user.controller;
 
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
+import top.kjwang.share.common.resp.CommonResp;
 import top.kjwang.share.user.domain.dto.LoginDTO;
 import top.kjwang.share.user.domain.entity.User;
 import top.kjwang.share.user.service.UserService;
@@ -19,12 +20,18 @@ public class UserController {
 	private UserService userService;
 
 	@GetMapping("/count")
-	public Long count() {
-		return userService.count();
+	public CommonResp<Long> count() {
+		Long count = userService.count();
+		CommonResp<Long> commonResp = new CommonResp<>();
+		commonResp.setData(count);
+		return commonResp;
 	}
 
 	@PostMapping("/login")
-	public User login(@RequestBody LoginDTO loginDTO){
-		return userService.login(loginDTO);
+	public CommonResp<User> login(@RequestBody LoginDTO loginDTO) {
+		User user = userService.login(loginDTO);
+		CommonResp<User> commonResp = new CommonResp<>();
+		commonResp.setData(user);
+		return commonResp;
 	}
 }
