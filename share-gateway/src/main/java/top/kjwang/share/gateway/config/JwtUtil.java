@@ -1,4 +1,4 @@
-package top.kjwang.share.common.util;
+package top.kjwang.share.gateway.config;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
