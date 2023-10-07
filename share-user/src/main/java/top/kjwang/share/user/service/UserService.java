@@ -1,5 +1,7 @@
 package top.kjwang.share.user.service;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.jwt.JWTUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -8,9 +10,11 @@ import top.kjwang.share.common.exception.BusinessExceptionEnum;
 import top.kjwang.share.common.util.SnowUtil;
 import top.kjwang.share.user.domain.dto.LoginDTO;
 import top.kjwang.share.user.domain.entity.User;
+import top.kjwang.share.user.domain.resp.UserLoginResp;
 import top.kjwang.share.user.mapper.UserMapper;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author kjwang
@@ -27,7 +31,7 @@ public class UserService {
 		return userMapper.selectCount(null);
 	}
 
-	public User login(LoginDTO loginDTO) {
+	public UserLoginResp login(LoginDTO loginDTO) {
 		// 根据手机号查询用户
 		User userDB = userMapper.selectOne(new QueryWrapper<User>().lambda().eq(User::getPhone, loginDTO.getPhone()));
 		// 没找到，抛出运行时异常
@@ -39,7 +43,14 @@ public class UserService {
 			throw new BusinessException(BusinessExceptionEnum.PASSWORD_ERROR);
 		}
 		// 都正确，返回
-		return userDB;
+		UserLoginResp userLoginResp = UserLoginResp.builder()
+				.user(userDB)
+				.build();
+		String key = "fatcat";
+		Map<String, Object> map = BeanUtil.beanToMap(userLoginResp);
+		String token = JWTUtil.createToken(map,key.getBytes());
+		userLoginResp.setToken(token);
+		return userLoginResp;
 	}
 
 	public Long register(LoginDTO loginDTO) {

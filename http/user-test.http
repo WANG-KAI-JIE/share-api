@@ -14,7 +14,8 @@ POST http://localhost:8000/user-service/user/login
 Content-Type: application/json
 
 {
-  "password": "888888"
+  "phone": "13951905171",
+  "password": "123123"
 }
 
 ###
