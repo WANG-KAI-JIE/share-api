@@ -2,8 +2,8 @@ package top.kjwang.share.content.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
-import com.github.pagehelper.util.StringUtil;
 import org.springframework.stereotype.Service;
 import top.kjwang.share.content.domain.entity.MidUserShare;
 import top.kjwang.share.content.domain.entity.Share;
@@ -33,19 +33,22 @@ public class ShareService {
 	 * @param title 标题
 	 * @param userId 用户id
 	 */
-	public List<Share> getList(String title, Long userId) {
+	public List<Share> getList(String title, Integer pagaNo, Integer pageSize, Long userId) {
 		// 构造查询条件
 		LambdaQueryWrapper<Share> wrapper = new LambdaQueryWrapper<>();
 		// 按照 id 降序查询所有数据
 		wrapper.orderByDesc(Share::getId);
 		// 如标题关键字不空，则加上模糊查询条件，否则结果即为所有数据
-		if (StringUtil.isNotEmpty(title)) {
+		if (title != null) {
 			wrapper.like(Share::getTitle,title);
 		}
 		// 过滤出所有已经通过审核的数据并需要显示的数据
 		wrapper.eq(Share::getAuditStatus,"PASS").eq(Share::getShowFlag, true);
+
+		// 内置的分页对象
+		Page<Share> page = Page.of(pagaNo,pageSize);
 		// 执行按条件查询
-		List<Share> shares = shareMapper.selectList(wrapper);
+		List<Share> shares = shareMapper.selectList(page,wrapper);
 
 		//处理后的 Share 数据列表
 		List<Share> sharesDeal;
