@@ -12,7 +12,7 @@ import top.kjwang.share.common.interceptor.Loginterceptor;
  * @description SpringMvcConfig
  */
 
-//@Configuration
+@Configuration
 public class SpringMvcConfig implements WebMvcConfigurer {
 	@Resource
 	private Loginterceptor loginterceptor;
