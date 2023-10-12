@@ -20,3 +20,5 @@ spring:
 logging:
   level:
     top.kjwang.share.user.mapper: debug
+date:
+  format: "yyyy-MM-dd HH:mm:ss"
