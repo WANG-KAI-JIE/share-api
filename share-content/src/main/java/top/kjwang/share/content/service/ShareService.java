@@ -5,10 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import top.kjwang.share.common.resp.CommonResp;
 import top.kjwang.share.content.domain.entity.MidUserShare;
 import top.kjwang.share.content.domain.entity.Share;
+import top.kjwang.share.content.feign.User;
+import top.kjwang.share.content.feign.UserService;
 import top.kjwang.share.content.mapper.MidUserShareMapper;
 import top.kjwang.share.content.mapper.ShareMapper;
+import top.kjwang.share.content.resp.ShareResp;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +30,9 @@ public class ShareService {
 
 	@Resource
 	private MidUserShareMapper midUserShareMapper;
+
+	@Resource
+	private UserService userService;
 
 	/**
 	 * 查询某个用户首页可见的资源列表
@@ -69,5 +76,10 @@ public class ShareService {
 			}).collect(Collectors.toList());
 		}
 		return sharesDeal;
+	}
+	public ShareResp findById(Long shareId) {
+		Share share = shareMapper.selectById(shareId);
+		CommonResp<User> commonResp = userService.getUser(share.getUserId());
+		return ShareResp.builder().share(share).nickname(commonResp.getData().getNickname()).avatarUrl(commonResp.getData().getAvatarUrl()).build();
 	}
 }

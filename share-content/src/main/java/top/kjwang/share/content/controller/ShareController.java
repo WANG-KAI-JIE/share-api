@@ -8,6 +8,7 @@ import top.kjwang.share.common.resp.CommonResp;
 import top.kjwang.share.common.util.JwtUtil;
 import top.kjwang.share.content.domain.entity.Notice;
 import top.kjwang.share.content.domain.entity.Share;
+import top.kjwang.share.content.resp.ShareResp;
 import top.kjwang.share.content.service.NoticeService;
 import top.kjwang.share.content.service.ShareService;
 
@@ -70,6 +71,14 @@ public class ShareController {
 		long userId = getUserIdFromToken(token);
 		CommonResp<List<Share>> commonResp = new CommonResp<>();
 		commonResp.setData(shareService.getList(title,pageNo,pageSize,userId));
+		return commonResp;
+	}
+
+	@GetMapping("/{id}")
+	public CommonResp<ShareResp> getShareById(@PathVariable Long id) {
+		ShareResp shareResp = shareService.findById(id);
+		CommonResp<ShareResp> commonResp = new CommonResp<>();
+		commonResp.setData(shareResp);
 		return commonResp;
 	}
 }

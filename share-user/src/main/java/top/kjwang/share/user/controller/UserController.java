@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import top.kjwang.share.common.resp.CommonResp;
 import top.kjwang.share.user.domain.dto.LoginDTO;
+import top.kjwang.share.user.domain.entity.User;
 import top.kjwang.share.user.domain.resp.UserLoginResp;
 import top.kjwang.share.user.service.UserService;
 
@@ -41,6 +42,14 @@ public class UserController {
 		Long id = userService.register(loginDTO);
 		CommonResp<Long> commonResp = new CommonResp<>();
 		commonResp.setData(id);
+		return commonResp;
+	}
+
+	@GetMapping("/{id}")
+	public CommonResp<User> getUserById(@PathVariable Long id) {
+		User user = userService.findById(id);
+		CommonResp<User> commonResp = new CommonResp<>();
+		commonResp.setData(user);
 		return commonResp;
 	}
 }

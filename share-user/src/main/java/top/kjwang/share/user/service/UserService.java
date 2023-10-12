@@ -4,14 +4,19 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.jwt.JWTUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import top.kjwang.share.common.exception.BusinessException;
 import top.kjwang.share.common.exception.BusinessExceptionEnum;
 import top.kjwang.share.common.util.JwtUtil;
 import top.kjwang.share.common.util.SnowUtil;
 import top.kjwang.share.user.domain.dto.LoginDTO;
+import top.kjwang.share.user.domain.dto.UserAddBonusMsgDTO;
+import top.kjwang.share.user.domain.entity.BonusEventLog;
 import top.kjwang.share.user.domain.entity.User;
 import top.kjwang.share.user.domain.resp.UserLoginResp;
+import top.kjwang.share.user.mapper.BonusEventLogMapper;
 import top.kjwang.share.user.mapper.UserMapper;
 
 import java.util.Date;
@@ -24,9 +29,36 @@ import java.util.Map;
  */
 
 @Service
+@Slf4j
 public class UserService {
 	@Resource
 	private UserMapper userMapper;
+
+	@Resource
+	private BonusEventLogMapper bonusEventLogMapper;
+
+	@Transactional(rollbackFor = Exception.class)
+	public void updateBonuses(UserAddBonusMsgDTO userAddBonusMsgDTO) {
+		System.out.println(userAddBonusMsgDTO);
+		// 1. 为用户修改基恩
+		Long userId = userAddBonusMsgDTO.getUserId();
+		Integer bonus = userAddBonusMsgDTO.getBonus();
+		User user = userMapper.selectById(userId);
+		user.setBonus(user.getBonus() + bonus);
+		userMapper.update(user, new QueryWrapper<User>().lambda().eq(User::getId, userId));
+
+		// 2. 记录日志到 bonus_event_log 表里
+		bonusEventLogMapper.insert(
+				BonusEventLog.builder()
+						.userId(userId)
+						.value(bonus)
+						.description(userAddBonusMsgDTO.getDescription())
+						.event(userAddBonusMsgDTO.getEvent())
+						.createTime(new Date())
+						.build()
+		);
+		log.info("积分添加完毕...");
+	}
 
 	public Long count() {
 		return userMapper.selectCount(null);
@@ -76,5 +108,9 @@ public class UserService {
 				.build();
 		userMapper.insert(savedUser);
 		return savedUser.getId();
+	}
+
+	public User findById(Long userId) {
+		return userMapper.selectById(userId);
 	}
 }
