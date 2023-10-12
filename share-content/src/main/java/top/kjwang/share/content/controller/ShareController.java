@@ -3,6 +3,8 @@ package top.kjwang.share.content.controller;
 import cn.hutool.json.JSONObject;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.web.bind.annotation.*;
 import top.kjwang.share.common.resp.CommonResp;
 import top.kjwang.share.common.util.JwtUtil;
@@ -24,12 +26,16 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/share")
 @Slf4j
+@RefreshScope
 public class ShareController {
 	@Resource
 	private NoticeService noticeService;
 
 	@Resource
 	private ShareService shareService;
+
+	@Value("${show}")
+	Boolean flag;
 
 	// 定义每页最多的数据量，以防前端定义传递超大參数，造成页面数据量过大
 	private final int MAX = 100;
@@ -56,7 +62,9 @@ public class ShareController {
 	@GetMapping(value = "/notice")
 	public CommonResp<Notice> getLatestNotice() {
 		CommonResp<Notice> commonResp = new CommonResp<>();
-		commonResp.setData(noticeService.getLatest());
+		Notice notice = noticeService.getLatest();
+		notice.setShowFlag(flag);
+		commonResp.setData(notice);
 		return commonResp;
 	}
 

@@ -1,0 +1,20 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: content-service
+  cloud:
+    nacos:
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yml
+        namespace: dev
+        #        group: myGroup
+        timeout: 5000
+        config-long-poll-timeout: 10000
+        config-retry-time: 2000
+        max-retry: 3
+        # 开启监听和自动刷新
+        refresh-enabled: true
+        username: nacos
+        password: nacos
