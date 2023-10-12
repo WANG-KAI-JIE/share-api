@@ -1,7 +1,5 @@
 package top.kjwang.share.user.service;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.jwt.JWTUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +18,6 @@ import top.kjwang.share.user.mapper.BonusEventLogMapper;
 import top.kjwang.share.user.mapper.UserMapper;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * @author kjwang

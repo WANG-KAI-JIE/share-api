@@ -1,4 +1,4 @@
-package top.kjwang.share.user.domain.dto;
+package top.kjwang.share.content.feign;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

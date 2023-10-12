@@ -6,9 +6,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import top.kjwang.share.common.resp.CommonResp;
+import top.kjwang.share.content.domain.dto.ExchangeDTO;
 import top.kjwang.share.content.domain.entity.MidUserShare;
 import top.kjwang.share.content.domain.entity.Share;
 import top.kjwang.share.content.feign.User;
+import top.kjwang.share.content.feign.UserAddBonusMsgDTO;
 import top.kjwang.share.content.feign.UserService;
 import top.kjwang.share.content.mapper.MidUserShareMapper;
 import top.kjwang.share.content.mapper.ShareMapper;
@@ -81,5 +83,39 @@ public class ShareService {
 		Share share = shareMapper.selectById(shareId);
 		CommonResp<User> commonResp = userService.getUser(share.getUserId());
 		return ShareResp.builder().share(share).nickname(commonResp.getData().getNickname()).avatarUrl(commonResp.getData().getAvatarUrl()).build();
+	}
+
+	public Share exchange(ExchangeDTO exhchangeDTO) {
+		Long userId = exhchangeDTO.getUserId();
+		Long shareId = exhchangeDTO.getShareId();
+		// 1. 根据 id 查询 share，校验需要兑换的资源是否存在
+		Share share = shareMapper.selectById(shareId);
+		if (share == null){
+			throw new IllegalArgumentException("该分享不存在！");
+		}
+
+		// 2. 如果当前用户已经兑换过该分享，则直接返回该分享（不需要扣积分）
+		MidUserShare midUserShare = midUserShareMapper.selectOne(new QueryWrapper<MidUserShare>().lambda()
+				.eq(MidUserShare::getUserId,userId)
+				.eq(MidUserShare::getShareId,shareId));
+		if (midUserShare != null) {
+			return share;
+		}
+
+		// 3. 看用户积分是否足够
+		CommonResp<User> commonResp = userService.getUser(userId);
+		User user = commonResp.getData();
+		// 兑换这个资源所需要的积分
+		Integer price = share.getPrice();
+		// 看积分是否够
+		if (price > user.getBonus()) {
+			throw new IllegalArgumentException("用户积分不够！");
+		}
+
+		// 4. 修改积分（*-1 就是负值，扣分）
+		userService.updateBonus(UserAddBonusMsgDTO.builder().userId(userId).bonus(price * -1).build());
+		// 5. 向 mid_user_share 表插入一条数据，让这个用户对于这条资源拥有了下载权限
+		midUserShareMapper.insert(MidUserShare.builder().userId(userId).shareId(shareId).build());
+		return share;
 	}
 }
