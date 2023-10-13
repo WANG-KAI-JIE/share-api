@@ -144,4 +144,18 @@ public class ShareService {
 				.build();
 		return shareMapper.insert(share);
 	}
+	/**
+	 * 我的投稿
+	 *
+	 * @param pageNo 页码
+	 * @param pageSize 每页大小
+	 * @param userId 用户id
+	 * @return shares
+	 */
+	public List<Share> myContribute(Integer pageNo,Integer pageSize,Long userId) {
+		LambdaQueryWrapper<Share> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(Share::getUserId,userId);
+		Page<Share> page = Page.of(pageNo,pageSize);
+		return shareMapper.selectList(page,wrapper);
+	}
 }
