@@ -112,7 +112,7 @@ public class ShareController {
 	@GetMapping("/my-contribute")
 	public CommonResp<List<Share>> myContribute(
 			@RequestParam(required = false,defaultValue = "1") Integer pageNo,
-			@RequestParam(required =false,defaultValue = "8") Integer pageSize,
+			@RequestParam(required =false,defaultValue = "3") Integer pageSize,
 			@RequestHeader(value = "token",required = false)String token) {
 		if (pageSize > MAX) {
 			pageSize = MAX;

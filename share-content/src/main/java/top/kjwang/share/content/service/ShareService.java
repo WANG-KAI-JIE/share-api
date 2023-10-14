@@ -4,12 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.stereotype.Service;
 import top.kjwang.share.common.resp.CommonResp;
 import top.kjwang.share.content.domain.dto.ExchangeDTO;
+import top.kjwang.share.content.domain.dto.ShareAuditDTO;
 import top.kjwang.share.content.domain.dto.ShareRequestDTO;
+import top.kjwang.share.content.domain.dto.UserAddBonusMQDTO;
 import top.kjwang.share.content.domain.entity.MidUserShare;
 import top.kjwang.share.content.domain.entity.Share;
+import top.kjwang.share.content.enums.AuditStatusEnum;
 import top.kjwang.share.content.feign.User;
 import top.kjwang.share.content.feign.UserAddBonusMsgDTO;
 import top.kjwang.share.content.feign.UserService;
@@ -19,6 +23,7 @@ import top.kjwang.share.content.resp.ShareResp;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +43,8 @@ public class ShareService {
 	@Resource
 	private UserService userService;
 
+	@Resource
+	private RocketMQTemplate rocketTemplate;
 	/**
 	 * 查询某个用户首页可见的资源列表
 	 *
@@ -139,7 +146,7 @@ public class ShareService {
 				.createTime(new Date())
 				.updateTime(new Date())
 				.showFlag(false)
-				.auditStatus("NOT_KEY")
+				.auditStatus("NOT_YET")
 				.reason("未审核")
 				.build();
 		return shareMapper.insert(share);
@@ -154,6 +161,7 @@ public class ShareService {
 	 */
 	public List<Share> myContribute(Integer pageNo,Integer pageSize,Long userId) {
 		LambdaQueryWrapper<Share> wrapper = new LambdaQueryWrapper<>();
+		wrapper.orderByDesc(Share::getId);
 		wrapper.eq(Share::getUserId,userId);
 		Page<Share> page = Page.of(pageNo,pageSize);
 		return shareMapper.selectList(page,wrapper);
@@ -167,8 +175,52 @@ public class ShareService {
 	public List<Share> querySharesNotYet() {
 		LambdaQueryWrapper<Share> wrapper = new LambdaQueryWrapper<>();
 		wrapper.orderByDesc(Share::getId);
-		wrapper.eq(Share::getAuditStatus,false)
+		wrapper.eq(Share::getShowFlag,false)
 				.eq(Share::getAuditStatus,"NOT_YET");
 		return shareMapper.selectList(wrapper);
+	}
+
+	/**
+	 * 审核
+	 *
+	 * @param id id
+	 * @param shareAduidtDTO shareAduidtDTO
+	 * @return share
+	 */
+	public Share auditById(Long id, ShareAuditDTO shareAduidtDTO) {
+		// 1. 查询 share 是否存在，不存在或者当前的 audit_status ！= NOT_YET，邦么拋异常
+		Share share = shareMapper.selectById(id);
+		if (share == null) {
+			throw new IllegalArgumentException("参数非法！该分享不存在");
+		}
+		if (!Objects.equals("NOT_YET", share.getAuditStatus())) {
+			throw new IllegalArgumentException("参数非法！该分享已审核通过或审核不通过！");
+		}
+		// 2. 审核资源，将状态改为 PASS 或 REJECT，更新原因和是否发布显示
+		share.setAuditStatus(shareAduidtDTO.getAuditStatusEnum().toString());
+		share.setReason(shareAduidtDTO.getReason());
+		share.setShowFlag(shareAduidtDTO.getShowFlag());
+		LambdaQueryWrapper<Share> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(Share::getId, id);
+		this.shareMapper.update(share, wrapper);
+
+		// 3. 向 mid_user 插入一条数据，分享的作者通过审核后，默认拥有了下载权限
+		this.midUserShareMapper.insert(
+				MidUserShare.builder()
+						.userId(share.getUserId())
+						.shareId(id)
+						.build()
+		);
+
+		// 4. 如果是 PASS，那么发送消息给 rocketmq，让用户中心去消费，并为发布人添加积分（投稿加 50 积分）
+		if (AuditStatusEnum.PASS.equals(shareAduidtDTO.getAuditStatusEnum())) {
+			this.rocketTemplate.convertAndSend(
+					"add-bonus",
+					UserAddBonusMQDTO.builder()
+							.userId(share.getUserId())
+							.bonus(50)
+							.build());
+		}
+		return share;
 	}
 }

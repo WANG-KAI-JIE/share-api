@@ -22,3 +22,9 @@ logging:
     top.kjwang.share.user.mapper: debug
 date:
   format: "yyyy-MM-dd HH:mm:ss"
+
+rocketmq:
+  name-server: 47.98.246.199:9876
+  # 消费者
+  consumer:
+    group: test-group

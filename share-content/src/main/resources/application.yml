@@ -23,5 +23,13 @@ logging:
 date:
   format: "yyyy-MM-dd HH:mm:ss"
 
-
 #show: true
+rocketmq:
+  name-server: 47.98.246.199:9876
+  producer:
+    # 必须指定 group
+    group: test-group
+    send-message-timeout: 3000 # 消息发送超时时长，默认3s
+    retry-times-when-send-failed: 3 # 同步发送消息失败重试次数，默认2
+    retry-times-when-send-async-failed: 3 # 异步发送消息失败重试次数，默认2
+    customized-trace-topic: TEST__TOPIC
