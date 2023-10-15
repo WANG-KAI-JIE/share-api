@@ -10,6 +10,7 @@ import top.kjwang.share.common.resp.CommonResp;
 import top.kjwang.share.common.util.JwtUtil;
 import top.kjwang.share.content.domain.dto.ExchangeDTO;
 import top.kjwang.share.content.domain.dto.ShareRequestDTO;
+import top.kjwang.share.content.domain.entity.MidUserShare;
 import top.kjwang.share.content.domain.entity.Notice;
 import top.kjwang.share.content.domain.entity.Share;
 import top.kjwang.share.content.resp.ShareResp;
@@ -120,6 +121,14 @@ public class ShareController {
 		long userId = getUserIdFromToken(token);
 		CommonResp<List<Share>> commonResp = new CommonResp<>();
 		commonResp.setData(shareService.myContribute(pageNo,pageSize,userId));
+		return commonResp;
+	}
+
+	@GetMapping("/myExchange")
+	public CommonResp<List<Share>> myExchange(@RequestHeader(value = "token",required = false) String token) {
+		long userId = getUserIdFromToken(token);
+		CommonResp<List<Share>> commonResp = new CommonResp<>();
+		commonResp.setData(shareService.myExchange(userId));
 		return commonResp;
 	}
 }

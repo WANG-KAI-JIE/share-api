@@ -21,6 +21,7 @@ import top.kjwang.share.content.mapper.MidUserShareMapper;
 import top.kjwang.share.content.mapper.ShareMapper;
 import top.kjwang.share.content.resp.ShareResp;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -222,5 +223,24 @@ public class ShareService {
 							.build());
 		}
 		return share;
+	}
+
+	public List<Share> myExchange(Long userId) {
+		// 查询该用户发布和已兑换的资源id
+		LambdaQueryWrapper<MidUserShare> wrapper = new LambdaQueryWrapper<>();
+		wrapper.orderByDesc(MidUserShare::getId);
+		wrapper.eq(MidUserShare::getUserId,userId);
+		List<MidUserShare> midUserShares = midUserShareMapper.selectList(wrapper);
+		// 通过查到的发布和已兑换的资源id去找到该资源的其他信息。在前端页面间传参进行交互吧，后端没搞明白咋写
+		// 遍历 midUserShares，获取到每个shareId
+		List<Share> resultList = new ArrayList<>();
+		for (MidUserShare midUserShare : midUserShares) {
+			// 使用shareId查询Share表
+			LambdaQueryWrapper<Share> shareWrapper = new LambdaQueryWrapper<>();
+			shareWrapper.eq(Share::getId,midUserShare.getShareId());
+			List<Share> resources = shareMapper.selectList(shareWrapper);
+			resultList.addAll(resources);
+		}
+		return resultList;
 	}
 }
