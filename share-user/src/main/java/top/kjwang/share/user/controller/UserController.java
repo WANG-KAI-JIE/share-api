@@ -1,14 +1,20 @@
 package top.kjwang.share.user.controller;
 
+import cn.hutool.json.JSONObject;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import top.kjwang.share.common.resp.CommonResp;
+import top.kjwang.share.common.util.JwtUtil;
 import top.kjwang.share.user.domain.dto.LoginDTO;
 import top.kjwang.share.user.domain.dto.UserAddBonusMsgDTO;
+import top.kjwang.share.user.domain.entity.BonusEventLog;
 import top.kjwang.share.user.domain.entity.User;
 import top.kjwang.share.user.domain.resp.UserLoginResp;
 import top.kjwang.share.user.service.UserService;
+
+import java.util.List;
 
 /**
  * @author kjwang
@@ -18,9 +24,29 @@ import top.kjwang.share.user.service.UserService;
 
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
 	@Resource
 	private UserService userService;
+
+	/**
+	 * 封装一个从 token 中提取 userId 的方法
+	 * @param token
+	 * @return userId
+	 */
+	private long getUserIdFromToken(String token) {
+		log.info(">>>>>>>>> token" + token);
+		long userId = 0;
+		String noToken = "no-token";
+		if (!noToken.equals(token)) {
+			JSONObject jsonObject = JwtUtil.getJSONObject(token);
+			log.info("解析到 token 的 json 数据为：{}",jsonObject);
+			userId = Long.parseLong(jsonObject.get("id").toString());
+		} else {
+			log.info("没有 token");
+		}
+		return userId;
+	}
 
 	@GetMapping("/count")
 	public CommonResp<Long> count() {
@@ -67,6 +93,19 @@ public class UserController {
 		);
 		CommonResp<User> commonResp = new CommonResp<>();
 		commonResp.setData(userService.findById(userId));
+		return commonResp;
+	}
+
+
+	/**
+	 * 获取积分明细
+	 *
+	 */
+	@GetMapping("/myValue")
+	public CommonResp<List<BonusEventLog>> myValue(@RequestHeader(value = "token",required = false)String token) {
+		long userId = getUserIdFromToken(token);
+		CommonResp<List<BonusEventLog>> commonResp = new CommonResp<>();
+		commonResp.setData(userService.myValue(userId));
 		return commonResp;
 	}
 }

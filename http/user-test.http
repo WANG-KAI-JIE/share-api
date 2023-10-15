@@ -41,3 +41,8 @@ token: {{token}}
   "userId": 1,
   "bonus": -11
 }
+###
+GET http://localhost:8000/user-service/user/myValue
+Accept: application/json
+token: {{token}}
+###

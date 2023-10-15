@@ -1,5 +1,6 @@
 package top.kjwang.share.user.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import top.kjwang.share.user.mapper.BonusEventLogMapper;
 import top.kjwang.share.user.mapper.UserMapper;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author kjwang
@@ -109,5 +111,12 @@ public class UserService {
 
 	public User findById(Long userId) {
 		return userMapper.selectById(userId);
+	}
+
+	public List<BonusEventLog> myValue(Long userId) {
+		LambdaQueryWrapper<BonusEventLog> wrapper = new LambdaQueryWrapper<>();
+		wrapper.orderByDesc(BonusEventLog::getId);
+		wrapper.eq(BonusEventLog::getUserId,userId);
+		return bonusEventLogMapper.selectList(wrapper);
 	}
 }
