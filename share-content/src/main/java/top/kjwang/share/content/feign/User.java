@@ -1,5 +1,6 @@
 package top.kjwang.share.content.feign;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,8 +32,8 @@ public class User {
 	private String avatarUrl;
 
 	private Integer bonus;
-
+	@JsonFormat(locale = "zh",timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date createTime;
-
+	@JsonFormat(locale = "zh",timezone = "GMT+8",pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date updateTime;
 }
