@@ -1,6 +1,7 @@
 package top.kjwang.share.content.controller;
 
 import cn.hutool.json.JSONObject;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import java.util.List;
 @RequestMapping(value = "/share")
 @Slf4j
 @RefreshScope
+@Tag(name = "知识分享")
 public class ShareController {
 	@Resource
 	private NoticeService noticeService;

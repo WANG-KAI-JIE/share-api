@@ -33,3 +33,25 @@ rocketmq:
     retry-times-when-send-failed: 3 # 同步发送消息失败重试次数，默认2
     retry-times-when-send-async-failed: 3 # 异步发送消息失败重试次数，默认2
     customized-trace-topic: TEST__TOPIC
+# springdoc-openapi项目配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: 'content'
+      paths-to-match: '/**'
+      packages-to-scan: top.kjwang.share.content.controller
+# knife4j的增强配置，不需要增强可以不配
+knife4j:
+  enable: true
+  openai:
+    title: Knife4j文档
+    description: "`Knife4j文档`"
+    url: https://docs.xiaominfo.com
+    version: v1.0
+  setting:
+    language: zh_cn

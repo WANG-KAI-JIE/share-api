@@ -1,6 +1,10 @@
 package top.kjwang.share.user.controller;
 
 import cn.hutool.json.JSONObject;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/user")
 @Slf4j
+@Tag(name = "user参数")
 public class UserController {
 	@Resource
 	private UserService userService;
@@ -56,6 +61,8 @@ public class UserController {
 		return commonResp;
 	}
 
+	@Operation(summary = "登录")
+	@Parameters(@Parameter(name = "loginDTO",description = "登录参数"))
 	@PostMapping("/login")
 	public CommonResp<UserLoginResp> login(@Valid @RequestBody LoginDTO loginDTO) {
 		UserLoginResp userLoginResp = userService.login(loginDTO);

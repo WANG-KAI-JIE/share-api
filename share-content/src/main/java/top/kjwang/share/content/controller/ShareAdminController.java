@@ -1,5 +1,6 @@
 package top.kjwang.share.content.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import top.kjwang.share.common.resp.CommonResp;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/share/admin")
+@Tag(name = "知识分享管理员")
 public class ShareAdminController {
 	@Resource
 	private ShareService shareService;
