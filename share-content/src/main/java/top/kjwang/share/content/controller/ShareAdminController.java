@@ -27,6 +27,7 @@ public class ShareAdminController {
 	public CommonResp<List<Share>> getSharesNotYet() {
 		CommonResp<List<Share>> commonResp = new CommonResp<>();
 		commonResp.setData(shareService.querySharesNotYet());
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 
@@ -34,6 +35,7 @@ public class ShareAdminController {
 	public CommonResp<Share> auditById(@PathVariable Long id, @RequestBody ShareAuditDTO auditDTO) {
 		CommonResp<Share> commonResp = new CommonResp<>();
 		commonResp.setData(shareService.auditById(id, auditDTO));
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 }

@@ -58,6 +58,7 @@ public class UserController {
 		Long count = userService.count();
 		CommonResp<Long> commonResp = new CommonResp<>();
 		commonResp.setData(count);
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 
@@ -68,6 +69,7 @@ public class UserController {
 		UserLoginResp userLoginResp = userService.login(loginDTO);
 		CommonResp<UserLoginResp> commonResp = new CommonResp<>();
 		commonResp.setData(userLoginResp);
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 
@@ -76,6 +78,7 @@ public class UserController {
 		Long id = userService.register(loginDTO);
 		CommonResp<Long> commonResp = new CommonResp<>();
 		commonResp.setData(id);
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 
@@ -84,6 +87,7 @@ public class UserController {
 		User user = userService.findById(id);
 		CommonResp<User> commonResp = new CommonResp<>();
 		commonResp.setData(user);
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 
@@ -100,6 +104,7 @@ public class UserController {
 		);
 		CommonResp<User> commonResp = new CommonResp<>();
 		commonResp.setData(userService.findById(userId));
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 
@@ -113,6 +118,7 @@ public class UserController {
 		long userId = getUserIdFromToken(token);
 		CommonResp<List<BonusEventLog>> commonResp = new CommonResp<>();
 		commonResp.setData(userService.myValue(userId));
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 }

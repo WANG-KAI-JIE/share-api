@@ -84,6 +84,7 @@ public class ShareController {
 		long userId = getUserIdFromToken(token);
 		CommonResp<List<Share>> commonResp = new CommonResp<>();
 		commonResp.setData(shareService.getList(title,pageNo,pageSize,userId));
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 
@@ -91,6 +92,7 @@ public class ShareController {
 	public CommonResp<ShareResp> getShareById(@PathVariable Long id) {
 		ShareResp shareResp = shareService.findById(id);
 		CommonResp<ShareResp> commonResp = new CommonResp<>();
+		commonResp.setMessage("成功");
 		commonResp.setData(shareResp);
 		return commonResp;
 	}
@@ -99,6 +101,7 @@ public class ShareController {
 	public CommonResp<Share> exchange(@RequestBody ExchangeDTO exchangeDTO) {
 		System.out.println(exchangeDTO);
 		CommonResp<Share> commonResp = new CommonResp<>();
+		commonResp.setMessage("成功");
 		commonResp.setData(shareService.exchange(exchangeDTO));
 		return commonResp;
 	}
@@ -123,6 +126,7 @@ public class ShareController {
 		long userId = getUserIdFromToken(token);
 		CommonResp<List<Share>> commonResp = new CommonResp<>();
 		commonResp.setData(shareService.myContribute(pageNo,pageSize,userId));
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 
@@ -131,6 +135,7 @@ public class ShareController {
 		long userId = getUserIdFromToken(token);
 		CommonResp<List<Share>> commonResp = new CommonResp<>();
 		commonResp.setData(shareService.myExchange(userId));
+		commonResp.setMessage("成功");
 		return commonResp;
 	}
 }
